@@ -3,7 +3,7 @@
     grid-template-columns: repeat(12, 1fr);
     grid-template-rows: repeat(12, 1fr);
     gap: 5px 5px;
-    height: 97vh;
+    min-height: 100vh;
   }
   
   .geo-map { grid-area: 1 / 1 / 6 / 8; }

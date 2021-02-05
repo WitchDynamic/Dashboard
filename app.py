@@ -4,6 +4,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, Input, State
 import pandas as pd
+import plotly.graph_objects as go
 import plotly.express as px
 import json
 
@@ -14,8 +15,8 @@ DEFAULT_PLOT_LAYOUT = dict(
     font=dict(color="#EA526F"),
     xaxis=dict(showgrid=False),
     yaxis=dict(showgrid=False),
-    # margin=dict(l=10, r=10, b=10, t=10),
-    colorway=["#368F8B"],
+    margin=dict(l=1, r=1, b=1, t=50),
+    # colorway=["#368F8B"],
     clickmode="event+select",
 )
 
@@ -50,7 +51,10 @@ app.layout = html.Div(
         html.Div(
             dbc.Card(
                 [
-                    dbc.CardHeader("Header"),
+                    dbc.CardHeader(
+                        """Drag the slider to see the cummulative cases in the map below. 
+                        Click on a state to see the breakdown of cases over time."""
+                    ),
                     dbc.CardBody(
                         [
                             dcc.Slider(
@@ -63,7 +67,11 @@ app.layout = html.Div(
                                 updatemode="drag",
                                 persistence=False,
                             ),
-                            dcc.Graph(id="map"),  # graph on top
+                            dcc.Loading(
+                                dcc.Graph(id="map"),
+                                type="circle",
+                                color="#a262a9",
+                            ),  # graph on top
                         ]
                     ),
                 ],
@@ -74,7 +82,19 @@ app.layout = html.Div(
         ),
         html.Div(
             dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody("This is the body")],
+                [
+                    dbc.CardHeader("Header"),
+                    dbc.CardBody(
+                        dcc.Loading(
+                            dcc.Graph(  # state text on bottom
+                                id="selected-state-line-graph",
+                                # figure=dict(layout=DEFAULT_PLOT_LAYOUT),
+                            ),
+                            type="circle",
+                            color="#a262a9",
+                        ),
+                    ),
+                ],
                 color="secondary",
                 style={"height": "100%"},
             ),
@@ -125,17 +145,57 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output("output-section", "children"),
+    Output("selected-state-line-graph", "figure"),
     [Input("map", "selectedData")],
 )
 def update(selected):
     if selected:
         # selected is an object that looks like {'points': [{'location': ...}]}
         location = selected["points"][0]["location"]
-        print(location)
-        return location  # by returning this string to the 'output-section' defined above, we update the text
+        onestate = (
+            df_usa.groupby("Province_State").sum()[df_usa.columns[11:]].loc[location]
+        )
+        fig = px.line(
+            x=pd.to_datetime(onestate.index),
+            y=onestate,
+            color_discrete_sequence=["#a262a9"],
+            # title=f"{location} Cases"
+        )
+        fig.update_layout(
+            title={
+                "text": f"{location} Cases",
+                "y": 0.9,
+                "x": 0.5,
+                "xanchor": "center",
+                "yanchor": "top",
+            }
+        )
+        fig.update_layout(DEFAULT_PLOT_LAYOUT)
+        fig.update_xaxes(title_text="Date")
+        fig.update_yaxes(title_text="Frequency")
+        fig.update_xaxes(tickangle=315)
+        return fig
     else:
-        return "Please click a State"
+        all_states = df_usa.sum()[df_usa.columns[11:]]
+        fig = px.line(
+            x=pd.to_datetime(all_states.index),
+            y=all_states,
+            color_discrete_sequence=["#a262a9"],
+        )
+        fig.update_layout(
+            title={
+                "text": "United States Cases",
+                "y": 0.9,
+                "x": 0.5,
+                "xanchor": "center",
+                "yanchor": "top",
+            }
+        )
+        fig.update_layout(DEFAULT_PLOT_LAYOUT)
+        fig.update_xaxes(title_text="Date")
+        fig.update_yaxes(title_text="Frequency")
+        fig.update_xaxes(tickangle=315)
+        return fig
 
 
 @app.callback(
@@ -161,8 +221,10 @@ def update_slider(slide_val, marks):
         center={"lat": 37.0902, "lon": -95.7129},
         opacity=0.8,
     )
-    fig.update_layout(clickmode="event+select")
+    fig.update_layout(DEFAULT_PLOT_LAYOUT)
+
     return fig
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)
