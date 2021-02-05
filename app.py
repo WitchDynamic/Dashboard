@@ -2,6 +2,10 @@ import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from dash.dependencies import Output, Input, State
+import pandas as pd
+import plotly.express as px
+import json
 
 DEFAULT_PLOT_LAYOUT = dict(
     hovermode="x unified",
@@ -17,12 +21,52 @@ DEFAULT_PLOT_LAYOUT = dict(
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 
+# CONFIRMED US CASES
+df_usa = pd.read_csv("data/time_series_covid_19_confirmed_US.csv")
+px.set_mapbox_access_token(open(".mapbox_token").read())
+with open("geojson_states.json") as f:
+    states_geojson = json.load(f)
+states = df_usa.groupby("Province_State").sum()
+states = states.drop(
+    [
+        "American Samoa",
+        "Diamond Princess",
+        "Grand Princess",
+        "Guam",
+        "Puerto Rico",
+        "Northern Mariana Islands",
+        "Virgin Islands",
+    ]
+)
+marks = {
+    i: states[states.columns[11:]].columns[::30][i]
+    for i in range(len(states[states.columns[11:]].columns[::30]))
+}
+states = states.reset_index().rename(columns={"Province_State": "name"})
+
 app.layout = html.Div(
     className="grid-container",
     children=[
         html.Div(
             dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody(dcc.Graph(figure=dict(layout=DEFAULT_PLOT_LAYOUT),style={"height":"100%","width":"100%"}))],
+                [
+                    dbc.CardHeader("Header"),
+                    dbc.CardBody(
+                        [
+                            dcc.Slider(
+                                id="map-slider",
+                                min=0,
+                                max=len(marks) - 1,
+                                step=30,
+                                marks=marks,
+                                value=0,
+                                updatemode="drag",
+                                persistence=False,
+                            ),
+                            dcc.Graph(id="map"),  # graph on top
+                        ]
+                    ),
+                ],
                 color="secondary",
                 style={"height": "100%"},
             ),
@@ -79,6 +123,46 @@ app.layout = html.Div(
     ],
 )
 
+
+@app.callback(
+    Output("output-section", "children"),
+    [Input("map", "selectedData")],
+)
+def update(selected):
+    if selected:
+        # selected is an object that looks like {'points': [{'location': ...}]}
+        location = selected["points"][0]["location"]
+        print(location)
+        return location  # by returning this string to the 'output-section' defined above, we update the text
+    else:
+        return "Please click a State"
+
+
+@app.callback(
+    Output("map", "figure"),
+    [Input("map-slider", "value")],
+    [State("map-slider", "marks")],
+)
+def update_slider(slide_val, marks):
+    color = marks[str(slide_val)]
+    fig = px.choropleth_mapbox(
+        states,
+        geojson=states_geojson,
+        locations="name",
+        color=color,
+        featureidkey="properties.name",  # 'properties.name' in the states_geojson and 'name' in the states df match
+        color_continuous_scale="Teal",
+        range_color=(
+            0,
+            states[states.columns[11:]].max().max(),
+        ),  # force the color scale to respect global max
+        mapbox_style="mapbox://styles/gperrone/ck93esihw1tpa1itdwyjx0coe",
+        zoom=2.7,
+        center={"lat": 37.0902, "lon": -95.7129},
+        opacity=0.8,
+    )
+    fig.update_layout(clickmode="event+select")
+    return fig
 
 if __name__ == "__main__":
     app.run_server(debug=True)
