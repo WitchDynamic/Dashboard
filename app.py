@@ -22,7 +22,7 @@ app.layout = html.Div(
     children=[
         html.Div(
             dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody(dcc.Graph(figure=dict(layout=DEFAULT_PLOT_LAYOUT)))],
+                [dbc.CardHeader("Header"), dbc.CardBody(dcc.Graph(figure=dict(layout=DEFAULT_PLOT_LAYOUT),style={"height":"100%","width":"100%"}))],
                 color="secondary",
                 style={"height": "100%"},
             ),
