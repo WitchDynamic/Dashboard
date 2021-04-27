@@ -21,6 +21,8 @@ DEFAULT_PLOT_LAYOUT = dict(
     clickmode="event+select",
 )
 
+# test
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 
 # CONFIRMED US CASES
