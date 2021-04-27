@@ -7,18 +7,21 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import json
+from news_scraping import get_articles
 
 DEFAULT_PLOT_LAYOUT = dict(
     hovermode="x unified",
     plot_bgcolor="#4e5d6c",
     paper_bgcolor="#4e5d6c",
-    font=dict(color="#EA526F"),
+    font=dict(color="#FFFFFF"),
     xaxis=dict(showgrid=False),
     yaxis=dict(showgrid=False),
-    # margin=dict(l=10, r=10, b=10, t=10),
-    colorway=["#368F8B"],
+    margin=dict(l=1, r=1, b=1, t=50),
+    # colorway=["#368F8B"],
     clickmode="event+select",
 )
+
+# test
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 
@@ -45,92 +48,75 @@ marks = {
 }
 states = states.reset_index().rename(columns={"Province_State": "name"})
 
-app.layout = html.Div(
-    className="grid-container",
-    children=[
-        html.Div(
-            dbc.Card(
-                [
-                    dbc.CardHeader("Header"),
-                    dbc.CardBody(
-                        [
-                            dcc.Slider(
-                                id="map-slider",
-                                min=0,
-                                max=len(marks) - 1,
-                                step=30,
-                                marks=marks,
-                                value=0,
-                                updatemode="drag",
-                                persistence=False,
-                            ),
-                            dcc.Graph(id="map"),  # graph on top
-                        ]
-                    ),
-                ],
-                color="secondary",
-                style={"height": "100%"},
-            ),
-            className="geo-map",
-        ),
-        html.Div(
-            dbc.Card(
-                [
-                    dbc.CardHeader("Header"),
-                    dbc.CardBody(
-                        dcc.Graph(  # state text on bottom
-                            id="selected-state-line-graph",
-                            # figure=dict(layout=DEFAULT_PLOT_LAYOUT),
+content = dbc.Container(
+    [
+        dbc.Row(
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            """Drag the slider to see the cummulative cases in the map below. 
+                        Click on a state to see the breakdown of cases over time."""
                         ),
-                    ),
-                ],
-                color="secondary",
-                style={"height": "100%"},
+                        dbc.CardBody(
+                            [
+                                dcc.Slider(
+                                    id="map-slider",
+                                    min=0,
+                                    max=len(marks) - 1,
+                                    step=30,
+                                    marks=marks,
+                                    value=0,
+                                    updatemode="drag",
+                                    persistence=False,
+                                ),
+                                dcc.Loading(
+                                    dcc.Graph(id="map"),
+                                    type="circle",
+                                    # color="#a262a9",
+                                ),  # graph on top
+                            ]
+                        ),
+                    ],
+                    style={"height": "100%"},
+                    # width=12,
+                    # className="pb-2",
+                ),
+                className="geo-map",
             ),
-            className="cases-graph",
+            justify="center",
         ),
-        html.Div(
-            dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody("This is the body")],
-                color="secondary",
-                style={"height": "100%"},
+        dbc.Row(
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(
+                            "Hover over the line to see the cumulative cases up to a particular day."
+                        ),
+                        dbc.CardBody(
+                            dcc.Loading(
+                                dcc.Graph(  # state text on bottom
+                                    id="selected-state-line-graph",
+                                    # figure=dict(layout=DEFAULT_PLOT_LAYOUT),
+                                ),
+                                type="circle",
+                                # color="#a262a9",
+                            ),
+                        ),
+                    ],
+                    style={"height": "100%"},
+                ),
+                style={"margin-top": "15px"},
+                className="cases-graph",
             ),
-            className="death-rate",
-        ),
-        html.Div(
-            dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody("This is the body")],
-                color="secondary",
-                style={"height": "100%"},
-            ),
-            className="survival-rate",
-        ),
-        html.Div(
-            dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody("This is the body")],
-                color="secondary",
-                style={"height": "100%"},
-            ),
-            className="some-other-rate",
-        ),
-        html.Div(
-            dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody("This is the body")],
-                color="secondary",
-                style={"height": "100%"},
-            ),
-            className="county-overview",
-        ),
-        html.Div(
-            dbc.Card(
-                [dbc.CardHeader("Header"), dbc.CardBody("This is the body")],
-                color="secondary",
-                style={"height": "100%"},
-            ),
-            className="another-thing",
+            justify="center",
         ),
     ],
+    fluid=True,
+    style={"padding-right": "300px", "padding-left": "300px"},
 )
+
+app.layout = html.Div(content)
 
 
 @app.callback(
@@ -138,7 +124,6 @@ app.layout = html.Div(
     [Input("map", "selectedData")],
 )
 def update(selected):
-    print(selected)
     if selected:
         # selected is an object that looks like {'points': [{'location': ...}]}
         location = selected["points"][0]["location"]
@@ -148,7 +133,18 @@ def update(selected):
         fig = px.line(
             x=pd.to_datetime(onestate.index),
             y=onestate,
-            color_discrete_sequence=["#a262a9"],
+            color_discrete_sequence=["#23C6EF"],
+            # title=f"{location} Cases"
+        )
+        fig.update_layout(
+            title={
+                "text": f"{location} Cases",
+                "font_size": 20,
+                "y": 0.9,
+                "x": 0.5,
+                "xanchor": "center",
+                "yanchor": "top",
+            }
         )
         fig.update_layout(DEFAULT_PLOT_LAYOUT)
         fig.update_xaxes(title_text="Date")
@@ -156,12 +152,21 @@ def update(selected):
         fig.update_xaxes(tickangle=315)
         return fig
     else:
-        print("Nothing Selected")
         all_states = df_usa.sum()[df_usa.columns[11:]]
         fig = px.line(
             x=pd.to_datetime(all_states.index),
             y=all_states,
-            color_discrete_sequence=["#a262a9"],
+            color_discrete_sequence=["#23C6EF"],
+        )
+        fig.update_layout(
+            title={
+                "text": "United States Cases",
+                "font_size": 20,
+                "y": 0.9,
+                "x": 0.5,
+                "xanchor": "center",
+                "yanchor": "top",
+            }
         )
         fig.update_layout(DEFAULT_PLOT_LAYOUT)
         fig.update_xaxes(title_text="Date")
@@ -193,7 +198,8 @@ def update_slider(slide_val, marks):
         center={"lat": 37.0902, "lon": -95.7129},
         opacity=0.8,
     )
-    fig.update_layout(clickmode="event+select")
+    fig.update_layout(DEFAULT_PLOT_LAYOUT)
+
     return fig
 
 
