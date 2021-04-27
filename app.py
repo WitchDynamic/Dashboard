@@ -21,8 +21,6 @@ DEFAULT_PLOT_LAYOUT = dict(
     clickmode="event+select",
 )
 
-# test
-
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 
 # CONFIRMED US CASES
@@ -51,69 +49,71 @@ states = states.reset_index().rename(columns={"Province_State": "name"})
 content = dbc.Container(
     [
         dbc.Row(
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            """Drag the slider to see the cummulative cases in the map below. 
-                        Click on a state to see the breakdown of cases over time."""
-                        ),
-                        dbc.CardBody(
-                            [
-                                dcc.Slider(
-                                    id="map-slider",
-                                    min=0,
-                                    max=len(marks) - 1,
-                                    step=30,
-                                    marks=marks,
-                                    value=0,
-                                    updatemode="drag",
-                                    persistence=False,
-                                ),
+            [
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                """Drag the slider to see the cummulative cases in the map below. 
+                            Click on a state to see the breakdown of cases over time."""
+                            ),
+                            dbc.CardBody(
+                                [
+                                    dcc.Slider(
+                                        id="map-slider",
+                                        min=0,
+                                        max=len(marks) - 1,
+                                        step=30,
+                                        marks=marks,
+                                        value=0,
+                                        updatemode="drag",
+                                        persistence=False,
+                                    ),
+                                    dcc.Loading(
+                                        dcc.Graph(id="map"),
+                                        type="circle",
+                                        # color="#a262a9",
+                                    ),  # graph on top
+                                ]
+                            ),
+                        ],
+                        style={"height": "100%"},
+                        # className="pb-2",
+                    ),
+                    width=7,
+                    className="geo-map",
+                ),
+                # justify="center",
+                dbc.Col(
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(
+                                "Hover over the line to see the cumulative cases up to a particular day."
+                            ),
+                            dbc.CardBody(
                                 dcc.Loading(
-                                    dcc.Graph(id="map"),
+                                    dcc.Graph(  # state text on bottom
+                                        id="selected-state-line-graph",
+                                        # figure=dict(layout=DEFAULT_PLOT_LAYOUT),
+                                    ),
                                     type="circle",
                                     # color="#a262a9",
-                                ),  # graph on top
-                            ]
-                        ),
-                    ],
-                    style={"height": "100%"},
-                    # width=12,
-                    # className="pb-2",
-                ),
-                className="geo-map",
-            ),
-            justify="center",
-        ),
-        dbc.Row(
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(
-                            "Hover over the line to see the cumulative cases up to a particular day."
-                        ),
-                        dbc.CardBody(
-                            dcc.Loading(
-                                dcc.Graph(  # state text on bottom
-                                    id="selected-state-line-graph",
-                                    # figure=dict(layout=DEFAULT_PLOT_LAYOUT),
                                 ),
-                                type="circle",
-                                # color="#a262a9",
                             ),
-                        ),
-                    ],
-                    style={"height": "100%"},
+                        ],
+                        style={"height": "100%"},
+                    ),
+                    width=5,
+                    className="cases-graph",
                 ),
-                style={"margin-top": "15px"},
-                className="cases-graph",
-            ),
-            justify="center",
+            ]
         ),
+        # dbc.Row(
+        #     #justify="center",
+        # ),
     ],
     fluid=True,
-    style={"padding-right": "300px", "padding-left": "300px"},
+    style={"padding-right": "50px", "padding-left": "50px"},
 )
 
 app.layout = html.Div(content)

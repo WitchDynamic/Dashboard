@@ -1,3 +1,19 @@
+html {
+  height: 100%;
+}
 body {
-  background: linear-gradient(#30485E,#1F2F3E);
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background: linear-gradient(#30485E,#1F2F3E)
+}
+.card{
+  margin-top: 50px;
+}
+.rc-slider-mark-text-active{
+  color: #999999 !important;
+}
+.rc-slider-mark-text{
+  color: #FFFFFF;
 }
