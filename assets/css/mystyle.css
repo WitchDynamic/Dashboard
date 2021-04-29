@@ -6,14 +6,32 @@ body {
   margin: 0;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background: linear-gradient(#30485E,#1F2F3E)
+  background-image: linear-gradient(#30485E,#1F2F3E)
+  /* background-color: #30485E; */
 }
 .card{
-  margin-top: 50px;
+  margin-top: 40px;
+}
+.article-card{
+  margin-bottom: 10px !important;
+  margin-top: 5px;
 }
 .rc-slider-mark-text-active{
   color: #999999 !important;
 }
 .rc-slider-mark-text{
   color: #FFFFFF;
+}
+#news-container{
+  padding-top: 70px;
+}
+
+.nav-link{
+  padding-left: 0px;
+  padding-right: 10px;
+  color: #c3d9df;
+}
+
+a:hover{
+  color:#9EC4CE;
 }

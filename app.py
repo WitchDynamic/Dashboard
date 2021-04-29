@@ -46,6 +46,35 @@ marks = {
 }
 states = states.reset_index().rename(columns={"Province_State": "name"})
 
+
+def generate_cards():
+    articles = get_articles()
+    news = []
+    for article in articles:
+        news.append(
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.H5(
+                            dbc.NavItem(
+                                dbc.NavLink(article["title"], href=article["url"]),
+                                style={"list-style": "none"},
+                            )
+                        ),
+                        html.P(
+                            article["description"],
+                            className="card-text",
+                        ),
+                    ]
+                ),
+                className="article-card",
+            )
+        )
+    return news
+
+
+news_cards = generate_cards()
+
 content = dbc.Container(
     [
         dbc.Row(
@@ -78,12 +107,10 @@ content = dbc.Container(
                             ),
                         ],
                         style={"height": "100%"},
-                        # className="pb-2",
                     ),
                     width=7,
                     className="geo-map",
                 ),
-                # justify="center",
                 dbc.Col(
                     dbc.Card(
                         [
@@ -108,9 +135,14 @@ content = dbc.Container(
                 ),
             ]
         ),
-        # dbc.Row(
-        #     #justify="center",
-        # ),
+        dbc.Row(
+            dbc.Col(
+                html.Div(
+                    [dbc.CardDeck(news_cards[:5]), dbc.CardDeck(news_cards[5:10])],
+                    id="news-container",
+                )
+            ),
+        ),
     ],
     fluid=True,
     style={"padding-right": "50px", "padding-left": "50px"},
