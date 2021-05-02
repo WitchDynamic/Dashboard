@@ -47,8 +47,8 @@ marks = {
 states = states.reset_index().rename(columns={"Province_State": "name"})
 
 
-def generate_cards():
-    articles = get_articles()
+def generate_cards(location="USA"):
+    articles = get_articles(location)
     news = []
     for article in articles:
         news.append(
@@ -57,7 +57,11 @@ def generate_cards():
                     [
                         html.H5(
                             dbc.NavItem(
-                                dbc.NavLink(article["title"], href=article["url"]),
+                                dbc.NavLink(
+                                    article["title"],
+                                    href=article["url"],
+                                    target="_blank",
+                                ),
                                 style={"list-style": "none"},
                             )
                         ),
@@ -73,8 +77,6 @@ def generate_cards():
     return news
 
 
-news_cards = generate_cards()
-
 content = dbc.Container(
     [
         dbc.Row(
@@ -84,7 +86,7 @@ content = dbc.Container(
                         [
                             dbc.CardHeader(
                                 """Drag the slider to see the cummulative cases in the map below. 
-                            Click on a state to see the breakdown of cases over time."""
+                            Click on a state to see the breakdown of cases over time and its top news articles."""
                             ),
                             dbc.CardBody(
                                 [
@@ -121,10 +123,8 @@ content = dbc.Container(
                                 dcc.Loading(
                                     dcc.Graph(  # state text on bottom
                                         id="selected-state-line-graph",
-                                        # figure=dict(layout=DEFAULT_PLOT_LAYOUT),
                                     ),
                                     type="circle",
-                                    # color="#a262a9",
                                 ),
                             ),
                         ],
@@ -138,7 +138,7 @@ content = dbc.Container(
         dbc.Row(
             dbc.Col(
                 html.Div(
-                    [dbc.CardDeck(news_cards[:5]), dbc.CardDeck(news_cards[5:10])],
+                    # [dbc.CardDeck(id="cardnews"[:5]), dbc.CardDeck(id="cardnews"[5:10])],
                     id="news-container",
                 )
             ),
@@ -152,7 +152,10 @@ app.layout = html.Div(content)
 
 
 @app.callback(
-    Output("selected-state-line-graph", "figure"),
+    [
+        Output("selected-state-line-graph", "figure"),
+        Output("news-container", "children"),
+    ],
     [Input("map", "selectedData")],
 )
 def update(selected):
@@ -166,7 +169,6 @@ def update(selected):
             x=pd.to_datetime(onestate.index),
             y=onestate,
             color_discrete_sequence=["#23C6EF"],
-            # title=f"{location} Cases"
         )
         fig.update_layout(
             title={
@@ -182,7 +184,9 @@ def update(selected):
         fig.update_xaxes(title_text="Date")
         fig.update_yaxes(title_text="Frequency")
         fig.update_xaxes(tickangle=315)
-        return fig
+        news_cards = generate_cards(location.replace(" ", "+"))
+        my_card_deck = [dbc.CardDeck(news_cards[:5]), dbc.CardDeck(news_cards[5:10])]
+        return fig, my_card_deck
     else:
         all_states = df_usa.sum()[df_usa.columns[11:]]
         fig = px.line(
@@ -204,7 +208,9 @@ def update(selected):
         fig.update_xaxes(title_text="Date")
         fig.update_yaxes(title_text="Frequency")
         fig.update_xaxes(tickangle=315)
-        return fig
+        news_cards = generate_cards()
+        my_card_deck = [dbc.CardDeck(news_cards[:5]), dbc.CardDeck(news_cards[5:10])]
+        return fig, my_card_deck
 
 
 @app.callback(

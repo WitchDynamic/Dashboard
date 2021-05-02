@@ -6,8 +6,8 @@ from urllib.parse import parse_qs
 
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
 }
 
 
@@ -21,17 +21,16 @@ def get_articles(location="USA"):
     page_soup = soup(page_html, "html.parser")
 
     # Grab all news divs
-    containers = page_soup.findAll("div", class_="ZINbbc xpd O9g5cc uUPGi")
+    containers = page_soup.findAll("div", class_="dbsr")
 
     articles = []
     for container in containers:
-        content_div = list(container.div.next_siblings)[1]
         articles.append(
             dict(
-                source=container.h3.next_sibling.text,
-                title=container.h3.text,
-                description=content_div.a.next_sibling.div.div.div.span.next_sibling.next_sibling,
-                url=parse_qs(content_div.a["href"])["/url?q"][0],
+                source=container.find("div", class_="XTjFC WF4CUc").text,
+                title=container.find("div", class_="JheGif jBgGLd").text,
+                description=container.find("div", class_="Y3v8qd").text,
+                url=container.a["href"],
             )
         )
 
