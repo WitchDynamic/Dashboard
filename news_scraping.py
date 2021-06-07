@@ -28,7 +28,7 @@ def get_articles(location="USA"):
         articles.append(
             dict(
                 source=container.find("div", class_="XTjFC WF4CUc").text,
-                title=container.find("div", class_="JheGif jBgGLd").text,
+                title=container.find("div", class_="JheGif jBgGLd OSrXXb").text,
                 description=container.find("div", class_="Y3v8qd").text,
                 url=container.a["href"],
             )
