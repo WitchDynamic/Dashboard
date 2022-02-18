@@ -21,6 +21,7 @@ DEFAULT_PLOT_LAYOUT = dict(
 )
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
+server = app.server
 
 # CONFIRMED US CASES
 #df_usa = pd.read_csv("data/time_series_covid_19_confirmed_US.csv")
