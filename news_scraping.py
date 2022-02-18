@@ -12,7 +12,6 @@ headers = {
 }
 
 def get_url(url):
-    print(url)
     pattern = "(https.*)(&sa)"
     return re.search(pattern,url).groups()[0]
 

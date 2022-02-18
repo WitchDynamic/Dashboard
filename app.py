@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import json
 from news_scraping import get_articles
+from components.CardDeck import CardDeck
 
 DEFAULT_PLOT_LAYOUT = dict(
     hovermode="x unified",
@@ -70,8 +71,8 @@ def generate_cards(location="USA"):
                         ),
                     ]
                 ),
-                className="article-card",
-            )
+                className="article-card h-100",
+            ),
         )
     return news
 
@@ -135,12 +136,8 @@ content = dbc.Container(
             ]
         ),
         dbc.Row(
-            dbc.Col(
-                html.Div(
-                    # [dbc.CardDeck(id="cardnews"[:5]), dbc.CardDeck(id="cardnews"[5:10])],
-                    id="news-container",
-                )
-            ),
+            # [dbc.CardDeck(id="cardnews"[:5]), dbc.CardDeck(id="cardnews"[5:10])],
+            id="news-container",
         ),
     ],
     fluid=True,
@@ -184,7 +181,7 @@ def update(selected):
         fig.update_yaxes(title_text="Frequency")
         fig.update_xaxes(tickangle=315)
         news_cards = generate_cards(location.replace(" ", "+"))
-        my_card_deck = [dbc.CardDeck(news_cards[:5]), dbc.CardDeck(news_cards[5:10])]
+        my_card_deck = CardDeck(news_cards)
         return fig, my_card_deck
     else:
         all_states = df_usa.sum()[df_usa.columns[11:]]
@@ -208,7 +205,7 @@ def update(selected):
         fig.update_yaxes(title_text="Frequency")
         fig.update_xaxes(tickangle=315)
         news_cards = generate_cards()
-        my_card_deck = [dbc.CardDeck(news_cards[:5]), dbc.CardDeck(news_cards[5:10])]
+        my_card_deck = CardDeck(news_cards)
         return fig, my_card_deck
 
 

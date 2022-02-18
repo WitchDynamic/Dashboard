@@ -1,5 +1,5 @@
 dash
-dash-bootstrap-components<1.0.0
+dash-bootstrap-components
 pandas
 jupyter-dash
 bs4
