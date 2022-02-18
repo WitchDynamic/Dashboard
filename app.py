@@ -1,7 +1,5 @@
-import dash
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import Dash, html, dcc
 from dash.dependencies import Output, Input, State
 import pandas as pd
 import plotly.graph_objects as go
@@ -21,10 +19,11 @@ DEFAULT_PLOT_LAYOUT = dict(
     clickmode="event+select",
 )
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
+app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 
 # CONFIRMED US CASES
-df_usa = pd.read_csv("data/time_series_covid_19_confirmed_US.csv")
+#df_usa = pd.read_csv("data/time_series_covid_19_confirmed_US.csv")
+df_usa = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
 px.set_mapbox_access_token(open(".mapbox_token").read())
 with open("geojson_states.json") as f:
     states_geojson = json.load(f)
