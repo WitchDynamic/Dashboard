@@ -42,8 +42,8 @@ states = states.drop(
     ]
 )
 marks = {
-    i: states[states.columns[11:]].columns[::30][i]
-    for i in range(len(states[states.columns[11:]].columns[::30]))
+    i: states[states.columns[11:]].columns[::60][i]
+    for i in range(len(states[states.columns[11:]].columns[::60]))
 }
 states = states.reset_index().rename(columns={"Province_State": "name"})
 
@@ -95,7 +95,7 @@ content = dbc.Container(
                                         id="map-slider",
                                         min=0,
                                         max=len(marks) - 1,
-                                        step=30,
+                                        step=60,
                                         marks=marks,
                                         value=0,
                                         updatemode="drag",
