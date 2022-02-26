@@ -63,7 +63,7 @@ def generate_cards(location="USA"):
                                     href=article["url"],
                                     target="_blank",
                                 ),
-                                style={"list-style": "none"},
+                                style={"listStyle": "none"},
                             )
                         ),
                         html.P(
@@ -142,7 +142,7 @@ content = dbc.Container(
         ),
     ],
     fluid=True,
-    style={"padding-right": "50px", "padding-left": "50px"},
+    style={"paddingRight": "50px", "paddingLeft": "50px"},
 )
 
 app.layout = html.Div(content)

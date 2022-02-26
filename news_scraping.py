@@ -12,7 +12,7 @@ headers = {
 }
 
 def get_url(url):
-    pattern = "(https.*)(&sa)"
+    pattern = "(http.*)(&sa)"
     return re.search(pattern,url).groups()[0]
 
 
@@ -23,7 +23,7 @@ def get_articles(location="USA"):
 
     # Grab all news divs
     containers = page_soup.find_all("div", class_="ZINbbc luh4tb xpd O9g5cc uUPGi")
-
+    
     articles = []
     for container in containers:
         articles.append(
