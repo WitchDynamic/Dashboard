@@ -1,5 +1,8 @@
 # Covid-19 Dashboard
 
+### Live Demo
+[Check out the interactive dashboard here!](https://covid-usa-dash.herokuapp.com/)
+
 ### Pre-Requirements
 Dependencies can be easily installed by running the command:
 pip install -r requirements.txt
