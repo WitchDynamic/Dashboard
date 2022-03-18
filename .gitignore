@@ -1,3 +1,4 @@
 .ipynb_checkpoints
 *.ipynb
+.mapbox_token
 __pycache__
