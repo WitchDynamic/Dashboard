@@ -24,7 +24,10 @@ DEFAULT_PLOT_LAYOUT = dict(
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 server = app.server
 
-MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", ".mapbox_token")
+MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN")
+if(MAPBOX_TOKEN == None):
+    MAPBOX_TOKEN = open(".mapbox_token").read()
+
 
 # CONFIRMED US CASES
 #df_usa = pd.read_csv("data/time_series_covid_19_confirmed_US.csv")
