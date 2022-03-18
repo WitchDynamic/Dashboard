@@ -24,12 +24,12 @@ DEFAULT_PLOT_LAYOUT = dict(
 app = Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 server = app.server
 
-MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", open(".mapbox_token").read());
+MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", open(".mapbox_token").read())
 
 # CONFIRMED US CASES
 #df_usa = pd.read_csv("data/time_series_covid_19_confirmed_US.csv")
 df_usa = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv")
-px.set_mapbox_access_token(MAPBOX_TOKEN);
+px.set_mapbox_access_token(MAPBOX_TOKEN)
 with open("geojson_states.json") as f:
     states_geojson = json.load(f)
 states = df_usa.groupby("Province_State").sum()
