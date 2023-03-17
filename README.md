@@ -1,7 +1,7 @@
 # Covid-19 Dashboard
 
 ### Live Demo
-[Check out the interactive dashboard here!](https://covid-usa-dash.herokuapp.com/)
+[Check out the interactive dashboard here!](https://covid-19-dash-hac3.onrender.com)
 
 ### Pre-Requirements
 Dependencies can be easily installed by running the command:
